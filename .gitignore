@@ -2,8 +2,10 @@
 .DS_Store
 *.local
 *.log
-.vit
 dist
+dist-ssr
+*.local
 node_modules
 temp
 .eslintcache
+.vite
