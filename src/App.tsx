@@ -13,7 +13,7 @@ function App() {
 	}
 
 	return (
-		<div className=" flex max-w-5xl h-full m-auto">
+		<div className="flex max-w-5xl h-full m-auto">
 			<Menu updateChallenge={(e:string) => MenuHandler(e)} />
 			<div className="grow">
 				<ButtonSwitch setStep={(val) => setStep(val)} />
