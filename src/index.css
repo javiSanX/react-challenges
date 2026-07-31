@@ -1,5 +1,35 @@
 @import "tailwindcss";
 
-html {
-    background-color: rgb(24 24 27);
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center font-medium rounded-md transition-colors cursor-pointer;
+  }
+
+  .btn-xs {
+    @apply px-2 py-1 text-xs;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm;
+  }
+
+  .btn-lg {
+    @apply px-5 py-3 text-lg;
+  }
+
+  /* variantes opcionales */
+  .btn-primary {
+    @apply bg-black text-white hover:bg-neutral-800;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 text-gray-900 hover:bg-gray-300;
+  }
+    .btn-tertiary {
+    @apply bg-white text-gray-900 hover:bg-gray-300;
+  }
+
+  .box {
+   @apply p-3 rounded-xl
+  }
 }
