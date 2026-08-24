@@ -1,64 +1,93 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+
+const SIZES = {
+   width: 700,
+   height: 300,
+};
+
+interface Position {
+   x: number;
+   y: number;
+}
+
+interface Size {
+   width: number;
+   height: number;
+}
+const UP_DOWN = "up_down";
+const RIGHT_LEFT = "right_left";
 
 export default function ResizeDiv() {
-   const [size, setSize] = useState({ X: 700, Y: 400 });
+   const [sizes, setSizes] = useState<Size>(SIZES);
+   const resizing = useRef(false);
+   const direction = useRef(UP_DOWN);
+   const initialPosition = useRef<Position>({
+      x: 0,
+      y: 0,
+   });
+   const initialSize = useRef<Size>({
+      width: SIZES.width,
+      height: SIZES.height,
+   });
 
-   const resizeRightHandler = (
-      e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+   const handlePointerDown = (
+      e: React.PointerEvent<HTMLButtonElement>,
+      currDirection: string,
    ) => {
-      const startSize = size;
-      const startPosition = e.pageX;
-
-      function onMouseMove(e: MouseEvent) {
-         const currPos = e.pageX;
-         const currentMousePosition = currPos - startPosition;
-         const newValue = startSize.X + currentMousePosition;
-         if (newValue > 700) return;
-         setSize({ X: newValue, Y: size.Y });
-      }
-
-      function onMouseUp() {
-         document.removeEventListener("mousemove", onMouseMove);
-      }
-
-      document.addEventListener("mousemove", onMouseMove);
-      document.addEventListener("mouseup", onMouseUp, { once: true });
+      resizing.current = true;
+      initialPosition.current = { x: e.clientX, y: e.clientY };
+      initialSize.current = { width: sizes.width, height: sizes.height };
+      direction.current = currDirection;
    };
 
-   const resizeUpHandler = (
-      e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-   ) => {
-      const initialPosition = e.pageY;
-
-      const onMouseMove = (e: MouseEvent) => {
-         const currentMousePosition = e.pageY - initialPosition;
-         const updateValue = size.Y + currentMousePosition;
-         setSize({ X: size.X, Y: updateValue });
-      };
-
-      const onMouseUp = () => {
-         document.removeEventListener("mousemove", onMouseMove);
-      };
-
-      document.addEventListener("mousemove", onMouseMove);
-      document.addEventListener("mouseup", onMouseUp);
+   const handlePointerMove = (e: PointerEvent) => {
+      if (!resizing.current) return;
+      const deltaX = e.clientX - initialPosition.current.x;
+      const deltaY = e.clientY - initialPosition.current.y;
+      if (direction.current === UP_DOWN) {
+         setSizes({
+            width: initialSize.current.width,
+            height: initialSize.current.height + deltaY,
+         });
+      } else {
+         setSizes({
+            width: initialSize.current.width + deltaX,
+            height: initialSize.current.height,
+         });
+      }
    };
-   
+
+   const handlePointerUp = () => {
+      resizing.current = false;
+   };
+
+   useEffect(() => {
+      document.addEventListener("pointermove", handlePointerMove);
+      document.addEventListener("pointerup", handlePointerUp);
+
+      return () => {
+         document.removeEventListener("pointermove", handlePointerMove);
+         document.removeEventListener("pointerup", handlePointerUp);
+      };
+   }, []);
+
    return (
-      <div>
-         <h1>resize div</h1>
+      <div className="w-full h-full">
          <div
-            className="border-solid border-4 border-neutral-800 h-[300px] relative"
-            style={{ width: size.X, height: size.Y }}
+            className="relative border-4 flex"
+            style={{
+               width: sizes.width,
+               height: sizes.height,
+            }}
          >
-            <div
-               onMouseDown={(e) => resizeRightHandler(e)}
-               className="w-[8px] h-[50%] bg-neutral-800 rounded-md cursor-col-resize absolute right-[-15px] top-[50%] translate-y-[-50%]"
-            ></div>
-            <div
-               onMouseDown={(e) => resizeUpHandler(e)}
-               className="w-[50%] h-[8px] bg-neutral-800 rounded-md cursor-ns-resize absolute bottom-[-15px] left-[50%] translate-x-[-50%]"
-            ></div>
+            <button
+               className="  absolute right-[-20px] top-1/2 -translate-y-1/2 bg-black h-32 w-3 rounded-md cursor-pointer"
+               onPointerDown={(e) => handlePointerDown(e, RIGHT_LEFT)}
+            />
+            <button
+               className="absolute bottom-[-20px] left-1/2 -translate-x-1/2 bg-black h-3 w-32 rounded-md cursor-pointer"
+               onPointerDown={(e) => handlePointerDown(e, UP_DOWN)}
+            />
          </div>
       </div>
    );
