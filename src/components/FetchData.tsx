@@ -9,8 +9,6 @@ export default function Demo() {
    const { imageLoading, image, imageError, fetchImage } =
       useImageFetch(GET_IMAGE_URL);
 
-      
-
    if (loading || imageLoading)
       return (
          <div className="flex flex-col items-center p-8 text-center border-solid border border-neutral-800 text-white bg-black rounded-xl text-xs min-h-[400px]">
